@@ -1,5 +1,6 @@
 package main;
 
+import java.util.ArrayList;
 import model.Product;
 import model.Sale;
 import java.util.Scanner;
@@ -8,9 +9,9 @@ import model.Amount;
 public class Shop {
 
     private Amount cash = new Amount (100.00);
-    private Product[] inventory;
+    private ArrayList <Product> inventory;
     private int numberProducts;
-    private Sale[] sales;
+    private ArrayList <Sale> sales;
     static private int cSales;
     static private Amount totalAmount;
    
@@ -18,8 +19,8 @@ public class Shop {
     final static double TAX_RATE = 1.04;
 
     public Shop() {
-        inventory = new Product[10];
-        sales = new Sale[10];
+        inventory = new ArrayList <Product>();
+        sales = new ArrayList<Sale>();
     }
 
     public static void main(String[] args) {
@@ -44,6 +45,7 @@ public class Shop {
             System.out.println("6) Venta");
             System.out.println("7) Ver ventas");
             System.out.println("8) Ver total");
+            System.out.println("9) Eliminar producto del inventario");
             System.out.println("10) Salir programa");
             System.out.print("Seleccione una opcion: ");
             opcion = scanner.nextInt();
@@ -79,6 +81,9 @@ public class Shop {
                 case 8:
                     shop.showTotal();
                     break;
+                case 9:
+                    shop.deleteProduct();
+                    break;
 
                 case 10: //fix issue 1
                     exit = true;
@@ -102,7 +107,7 @@ public class Shop {
      
         double total=0.0;
          for (int i = 0; i < cSales; i++) {
-        total += sales[i].getAmount().getValue();
+        total += sales.get(i).getAmount().getValue();
     }
 
         
@@ -122,10 +127,10 @@ public class Shop {
      */
     public void addProduct() {
 
-        if (isInventoryFull()) {
-            System.out.println("No se pueden a\u00f1adir mas productos");
-            return;
-        }
+//        if (isInventoryFull()) {
+//            System.out.println("No se pueden a\u00f1adir mas productos");
+//            return;
+//        } 
 
         System.out.print("Nombre: ");
         Scanner scanner = new Scanner(System.in);
@@ -211,8 +216,8 @@ public class Shop {
         // sale product until input name is not 0
          String name = "";
         // defino carrito
-        Product[] carrito = new Product[numberProducts];
-        int cP = 0;
+//        Product[] carrito = new Product[numberProducts];
+//        int cP = 0;
         while (!name.equals("0")) {
             System.out.println("Introduce el nombre del producto, escribir 0 para terminar:");
             name = sc.nextLine();
@@ -233,8 +238,8 @@ public class Shop {
                     product.setAvailable(false);
                 }
                 // add carrito
-                carrito[cP]= product;
-                cP++;
+//                carrito[cP]= product;
+//                cP++;
                 System.out.println("Producto a\u00f1adido con Ã©xito");
 
             }
@@ -251,10 +256,10 @@ public class Shop {
         // show cost total
         //totalAmount.getValue(totalAmount.setValue());
         cash.setValue(cash.getValue() + totalAmount.getValue());
-        Sale sale = new Sale(client, carrito, totalAmount);
+        Sale sale = new Sale (client, totalAmount);
         
         // add sale a shop.sales
-        sales[cSales]=sale;
+        sales.add (sale);
         cSales++;
         System.out.println("Venta realizada con exito, total: " + totalAmount);
         //showTotal
@@ -284,12 +289,11 @@ public class Shop {
      * @param product
      */
     public void addProduct(Product product) {
-        if (isInventoryFull()) {
-            System.out.println("No se pueden a\u00f1adir mas productos, se ha alcanzado el maximo de " + inventory.length);
-            return;
-        }
-        inventory[numberProducts] = product;
-        numberProducts++;
+//        if (isInventoryFull()) {
+//            System.out.println("No se pueden a\u00f1adir mas productos, se ha alcanzado el maximo de " + inventory.length);
+//            return;
+//        }
+        inventory.add(product); //Pasa a añadir directamente sin necesidad de tener contador 
     }
 
     /**
@@ -297,13 +301,13 @@ public class Shop {
      *
      * @return true if inventory is full
      */
-    public boolean isInventoryFull() {
-        if (numberProducts == 10) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+//    public boolean isInventoryFull() {
+//        if (numberProducts == 10) {
+//            return true;
+//        } else {
+//            return false;
+//        }
+//    } 
 
     /**
      * find product by name
@@ -312,12 +316,31 @@ public class Shop {
      * @return product found by name
      */
     public Product findProduct(String name) {
-        for (int i = 0; i < inventory.length; i++) {
-            if (inventory[i] != null && inventory[i].getName().equalsIgnoreCase(name)) {
-                return inventory[i];
-            }
-        }
-        return null;
+        if(inventory.contains(new Product(name))){
+                return inventory.get(inventory.indexOf(new Product(name))) ;
+        }else 
+            return null;
+       
+
     }
 
-}
+    public void deleteProduct() {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Ingresa el producto que quieres eliminar");
+        String pr = sc.nextLine();
+        Product product = findProduct(pr);
+        
+            if(product!=null){
+                inventory.remove(product);
+                System.out.println("Producto eliminado!");
+                
+            } else{
+                System.out.println("Producto no encontrado");
+        
+    }
+        }
+        
+    }
+
+
+

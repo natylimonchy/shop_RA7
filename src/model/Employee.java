@@ -18,13 +18,17 @@ public class Employee extends Person implements Logable{
     
     public static final int EMPLOYEE_ID = 123;
     public static final String PASSWORD = "test";
+    
+    
 
-
-    public Employee(int employeeld, String password, String name) {
+    
+    public Employee(String name) {
         super(name);
-        this.employeeld = employeeld;
-        this.password = password;
+        
     }
+
+    
+    
 
     public int getEmployeeld() {
         return employeeld;
@@ -58,9 +62,15 @@ public class Employee extends Person implements Logable{
 
     @Override
     public boolean login(int user, String password) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        if(user == EMPLOYEE_ID && password.equals(PASSWORD)){
+            return true;
+            
+        } else{
+            return false;
+        }
     }
+}
     
    
     
-}
+

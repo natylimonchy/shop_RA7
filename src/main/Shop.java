@@ -5,6 +5,8 @@ import model.Product;
 import model.Sale;
 import java.util.Scanner;
 import model.Amount;
+import model.Client;
+import model.Employee;
 
 public class Shop {
 
@@ -14,6 +16,7 @@ public class Shop {
     private ArrayList <Sale> sales;
     static private int cSales;
     static private Amount totalAmount;
+    private Employee employee;
    
 
     final static double TAX_RATE = 1.04;
@@ -21,6 +24,35 @@ public class Shop {
     public Shop() {
         inventory = new ArrayList <Product>();
         sales = new ArrayList<Sale>();
+    }
+    
+    public void initSession(){
+        Scanner sc = new Scanner (System.in);
+        
+        boolean logged = false;     
+        while (!logged){
+        System.out.println("Ingresa tu nombre");
+        String name = sc.nextLine();
+        Employee empleado = new Employee (name);
+            
+        
+        System.out.println("Ingresa tu usuario");
+        int user = sc.nextInt();
+        sc.nextLine();
+        System.out.println("Ingresa tu contraseña");
+        String pass = sc.nextLine();
+        
+        logged = empleado.login(user, pass);
+        if(!logged){
+            
+            System.out.println("Usuario o contraseña incorrecto");
+        }
+        }
+        System.out.println("Inicio de sesion exitoso");
+            
+
+        
+        
     }
 
     public static void main(String[] args) {
@@ -31,7 +63,7 @@ public class Shop {
         Scanner scanner = new Scanner(System.in);
         int opcion = 0;
         boolean exit = false;
-
+        shop.initSession();
         do {
             System.out.println("\n");
             System.out.println("===========================");
@@ -211,13 +243,16 @@ public class Shop {
         //PEDIR NOMBRE CLIENTE
         Scanner sc = new Scanner(System.in);
         System.out.println("Realizar venta, escribir nombre cliente");
-        String client = sc.nextLine();
+        String nClient = sc.nextLine();
+        Client client = new Client (nClient);
 
         // sale product until input name is not 0
          String name = "";
         // defino carrito
 //        Product[] carrito = new Product[numberProducts];
 //        int cP = 0;
+
+        double totalP=0;
         while (!name.equals("0")) {
             System.out.println("Introduce el nombre del producto, escribir 0 para terminar:");
             name = sc.nextLine();
@@ -227,11 +262,18 @@ public class Shop {
             }
             //CONSEGUIR EL PRODUCTO
             Product product = findProduct(name);
+           
             boolean productAvailable = false;
+            
+            
+
+
             
             if (product != null && product.isAvailable()) {
                 productAvailable = true;
-                totalAmount = product.getPublicPrice();
+                totalP += product.getPublicPrice().getValue();
+                
+                
                 product.setStock(product.getStock() - 1);
                 // if no more stock, set as not available to sale
                 if (product.getStock() == 0) {
@@ -252,25 +294,33 @@ public class Shop {
                  
         }
        
-
+         totalAmount = new Amount(totalP);
         // show cost total
         //totalAmount.getValue(totalAmount.setValue());
         cash.setValue(cash.getValue() + totalAmount.getValue());
-        Sale sale = new Sale (client, totalAmount);
+        Sale sale = new Sale ( client, totalAmount);
+        
+
         
         // add sale a shop.sales
         sales.add (sale);
         cSales++;
-        System.out.println("Venta realizada con exito, total: " + totalAmount);
+        System.out.println("Venta realizada con exito, total: " + totalAmount.getValue());
         //showTotal
         
+
+        if(client.pay(totalAmount)){
+            System.out.println("Su saldo es de: " + client.getBalance().getValue());
+        }else{
+            System.out.println("Tienes un saldo negativo de: " + client.getBalance().getValue());
+        }
     }
 
     /**
      * show all sales
      */
     private void showSales() {
-        System.out.println("Lista de ventas:");
+        System.out.println("Lista de ventas: ");
         for (Sale sale : sales) {
             if (sale != null) {
                 System.out.println(sale);

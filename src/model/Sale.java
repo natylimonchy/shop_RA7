@@ -5,24 +5,27 @@ import java.util.Objects;
 
 
 public class Sale {
-	String client;
+	Client client;
 	ArrayList <Product> products;
 	Amount amount;
 
-	public Sale(String client, Amount amount) {
+	public Sale( Client client, Amount amount) {
 		super();
 		this.client = client;
 		this.products = new ArrayList <> ();
 		this.amount = amount;
 	}
 
-	public String getClient() {
-		return client;
-	}
+    public Client getClient() {
+        return client;
+    }
 
-	public void setClient(String client) {
-		this.client = client;
-	}
+    public void setClient(Client client) {
+        this.client = client;
+    }
+        
+        
+	
 
 	
 

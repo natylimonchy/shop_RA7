@@ -238,100 +238,85 @@ public class Shop {
      * make a sale of products to a client
      */
     public void sale() {
-        // ask for client name
-        
-        //PEDIR NOMBRE CLIENTE
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Realizar venta, escribir nombre cliente");
-        String nClient = sc.nextLine();
-        Client client = new Client (nClient);
 
-        // sale product until input name is not 0
-         String name = "";
-        // defino carrito
-//        Product[] carrito = new Product[numberProducts];
-//        int cP = 0;
+    Scanner sc = new Scanner(System.in);
 
-        double totalP=0;
-        while (!name.equals("0")) {
-            System.out.println("Introduce el nombre del producto, escribir 0 para terminar:");
-            name = sc.nextLine();
+    // PEDIR CLIENTE
+    System.out.println("Realizar venta, escribir nombre cliente");
+    String nClient = sc.nextLine();
 
-            if (name.equals("0")) {
-                break;
-            }
-            //CONSEGUIR EL PRODUCTO
-            Product product = findProduct(name);
-           
-            boolean productAvailable = false;
-            
-            
+    System.out.println("Ingresa el ID del cliente");
+    int idCliente = sc.nextInt();
+    sc.nextLine(); // limpiar buffer
 
+    if (Client.MEMBER_ID != idCliente) {
+        System.out.println("--------- ID INCORRECTO -------");
+        return; // salir del método
+    }
 
-            
-            if (product != null && product.isAvailable()) {
-                productAvailable = true;
-                totalP += product.getPublicPrice().getValue();
-                
-                
-                product.setStock(product.getStock() - 1);
-                // if no more stock, set as not available to sale
-                if (product.getStock() == 0) {
-                    product.setAvailable(false);
-                }
-                // add carrito
-//                carrito[cP]= product;
-//                cP++;
-                System.out.println("Producto a\u00f1adido con Ã©xito");
+    Client client = new Client(nClient); 
 
-            }
+    String name = "";
+    double totalP = 0;
 
-            if (!productAvailable) {
-                System.out.println("Producto no encontrado o sin stock");
-            }
-            
-        
-                 
+    // VENTA DE PRODUCTOS
+    while (true) {
+        System.out.println("Introduce el nombre del producto, escribir 0 para terminar:");
+        name = sc.nextLine();
+
+        if (name.equals("0")) {
+            break;
         }
-       
-         totalAmount = new Amount(totalP);
-        // show cost total
-        //totalAmount.getValue(totalAmount.setValue());
-        cash.setValue(cash.getValue() + totalAmount.getValue());
-        Sale sale = new Sale ( client, totalAmount);
-        
 
-        
-        // add sale a shop.sales
-        sales.add (sale);
-        cSales++;
-        System.out.println("Venta realizada con exito, total: " + totalAmount.getValue());
-        //showTotal
-        
+        Product product = findProduct(name);
 
-        if(client.pay(totalAmount)){
-            System.out.println("Su saldo es de: " + client.getBalance().getValue());
-        }else{
-            System.out.println("Tienes un saldo negativo de: " + client.getBalance().getValue());
+        if (product != null && product.isAvailable()) {
+            totalP += product.getPublicPrice().getValue();
+            product.setStock(product.getStock() - 1);
+
+            if (product.getStock() == 0) {
+                product.setAvailable(false);
+            }
+
+            System.out.println("Producto añadido con éxito");
+        } else {
+            System.out.println("Producto no encontrado o sin stock");
         }
     }
+
+    Amount totalAmount = new Amount(totalP);
+
+    cash.setValue(cash.getValue() + totalAmount.getValue());
+
+    Sale sale = new Sale(client, totalAmount);
+    sales.add(sale);
+    cSales++;
+
+    System.out.println("Venta realizada con éxito, total: " + totalAmount.getValue());
+
+    if (client.pay(totalAmount)) {
+        System.out.println("Su saldo es de: " + client.getBalance().getValue());
+    } else {
+        System.out.println("Tienes un saldo negativo de: " + client.getBalance().getValue());
+    }
+}
+
 
     /**
      * show all sales
      */
     private void showSales() {
-        System.out.println("Lista de ventas: ");
-        for (Sale sale : sales) {
-            if (sale != null) {
-                System.out.println(sale);
-                return;
-            } else {
-                System.out.println("No hay ventas");
-                break;
-            }
-        }
-        
+    System.out.println("Lista de ventas:");
+
+    if (sales.isEmpty()) {
+        System.out.println("No hay ventas");
+        return;
     }
+
+    for (Sale sale : sales) {
+        System.out.println(sale);
+    }
+}
 
     /**
      * add a product to inventory

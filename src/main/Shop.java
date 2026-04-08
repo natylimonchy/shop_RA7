@@ -1,5 +1,6 @@
 package main;
 
+import java.nio.file.Files;
 import java.util.ArrayList;
 import model.Product;
 import model.Sale;
@@ -7,52 +8,49 @@ import java.util.Scanner;
 import model.Amount;
 import model.Client;
 import model.Employee;
+import model.Ficheros;
+import static model.Ficheros.LecturaFichero;
 
 public class Shop {
 
-    private Amount cash = new Amount (100.00);
-    private ArrayList <Product> inventory;
+    private Amount cash = new Amount(100.00);
+    private ArrayList<Product> inventory;
     private int numberProducts;
-    private ArrayList <Sale> sales;
+    private ArrayList<Sale> sales;
     static private int cSales;
     static private Amount totalAmount;
     private Employee employee;
-   
 
     final static double TAX_RATE = 1.04;
 
     public Shop() {
-        inventory = new ArrayList <Product>();
+        inventory = new ArrayList<Product>();
         sales = new ArrayList<Sale>();
     }
-    
-    public void initSession(){
-        Scanner sc = new Scanner (System.in);
-        
-        boolean logged = false;     
-        while (!logged){
-        System.out.println("Ingresa tu nombre");
-        String name = sc.nextLine();
-        Employee empleado = new Employee (name);
-            
-        
-        System.out.println("Ingresa tu usuario");
-        int user = sc.nextInt();
-        sc.nextLine();
-        System.out.println("Ingresa tu contraseña");
-        String pass = sc.nextLine();
-        
-        logged = empleado.login(user, pass);
-        if(!logged){
-            
-            System.out.println("Usuario o contraseña incorrecto");
-        }
+
+    public void initSession() {
+        Scanner sc = new Scanner(System.in);
+
+        boolean logged = false;
+        while (!logged) {
+            System.out.println("Ingresa tu nombre");
+            String name = sc.nextLine();
+            Employee empleado = new Employee(name);
+
+            System.out.println("Ingresa tu usuario");
+            int user = sc.nextInt();
+            sc.nextLine();
+            System.out.println("Ingresa tu contraseña");
+            String pass = sc.nextLine();
+
+            logged = empleado.login(user, pass);
+            if (!logged) {
+
+                System.out.println("Usuario o contraseña incorrecto");
+            }
         }
         System.out.println("Inicio de sesion exitoso");
-            
 
-        
-        
     }
 
     public static void main(String[] args) {
@@ -114,7 +112,7 @@ public class Shop {
                     shop.showTotal();
                     break;
                 case 9:
-                    shop.deleteProduct();
+//                    shop.deleteProduct();
                     break;
 
                 case 10: //fix issue 1
@@ -128,28 +126,24 @@ public class Shop {
      * load initial inventory to shop
      */
     public void loadInventory() {
-        
-        addProduct(new Product("Manzana", new Amount(10.0), true, 10));
-        addProduct(new Product("Pera", new Amount(20.0), true, 20));
-        addProduct(new Product("Hamburguesa", new Amount(30.0), true, 30));
-        addProduct(new Product("Fresa", new Amount(5.0), true, 20));
-    }
-    
-    public void showTotal (){
-     
-        double total=0.0;
-         for (int i = 0; i < cSales; i++) {
-        total += sales.get(i).getAmount().getValue();
+        inventory.clear();
+        LecturaFichero(inventory);
     }
 
-        
+    public void showTotal() {
+
+        double total = 0.0;
+        for (int i = 0; i < cSales; i++) {
+            total += sales.get(i).getAmount().getValue();
+        }
+
         System.out.println("El total de ventas: " + total);
     }
 
     /**
      * show current total cash
      */
-    private void showCash() {
+    public void showCash() {
 
         System.out.println("Dinero actual: " + cash);
     }
@@ -163,7 +157,6 @@ public class Shop {
 //            System.out.println("No se pueden a\u00f1adir mas productos");
 //            return;
 //        } 
-
         System.out.print("Nombre: ");
         Scanner scanner = new Scanner(System.in);
         String name = scanner.nextLine();
@@ -171,11 +164,10 @@ public class Shop {
         if (product == null) {
             System.out.print("Precio mayorista: ");
             Double mayorista = scanner.nextDouble();
-            Amount wholesalerPrice = new Amount (mayorista);
+            Amount wholesalerPrice = new Amount(mayorista);
             System.out.print("Stock: ");
             int stock = scanner.nextInt();
 
-           
             addProduct(new Product(name, wholesalerPrice, true, stock));
 
         } else {
@@ -186,22 +178,24 @@ public class Shop {
     /**
      * add stock for a specific product
      */
-    public void addStock() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Seleccione un nombre de producto: ");
-        String name = scanner.next();
-        Product product = findProduct(name);
+    public boolean addStock(String nameProduct,int stock) {
+//        Scanner scanner = new Scanner(System.in);
+//        System.out.print("Seleccione un nombre de producto: ");
+//        String name = scanner.next();
+        Product product = findProduct(nameProduct);
 
         if (product != null) {
             // ask for stock
-            System.out.print("Seleccione la cantidad a a\u00f1adir: ");
-            int stock = scanner.nextInt();
+//            System.out.print("Seleccione la cantidad a a\u00f1adir: ");
+//            int stock = scanner.nextInt();
             // update stock product
             product.setStock(product.getStock() + stock);
-            System.out.println("El stock del producto " + name + " ha sido actualizado a " + product.getStock());
+            System.out.println("El stock del producto " + nameProduct + " ha sido actualizado a " + product.getStock());
+            return true;
 
         } else {
-            System.out.println("No se ha encontrado el producto con nombre " + name);
+            System.out.println("No se ha encontrado el producto con nombre " + nameProduct);
+            return false;
         }
     }
 
@@ -239,84 +233,90 @@ public class Shop {
      */
     public void sale() {
 
-    Scanner sc = new Scanner(System.in);
+        Scanner sc = new Scanner(System.in);
 
-    // PEDIR CLIENTE
-    System.out.println("Realizar venta, escribir nombre cliente");
-    String nClient = sc.nextLine();
+        System.out.println("Realizar venta, escribir nombre cliente");
+        String nClient = sc.nextLine();
 
-    System.out.println("Ingresa el ID del cliente");
-    int idCliente = sc.nextInt();
-    sc.nextLine(); // limpiar buffer
+        System.out.println("Ingresa el ID del cliente");
+        int idCliente = sc.nextInt();
+        sc.nextLine();
 
-    if (Client.MEMBER_ID != idCliente) {
-        System.out.println("--------- ID INCORRECTO -------");
-        return; // salir del método
-    }
-
-    Client client = new Client(nClient); 
-
-    String name = "";
-    double totalP = 0;
-
-    // VENTA DE PRODUCTOS
-    while (true) {
-        System.out.println("Introduce el nombre del producto, escribir 0 para terminar:");
-        name = sc.nextLine();
-
-        if (name.equals("0")) {
-            break;
+        if (Client.MEMBER_ID != idCliente) {
+            System.out.println("--------- ID INCORRECTO -------");
+            return;
         }
 
-        Product product = findProduct(name);
+        Client client = new Client(nClient);
 
-        if (product != null && product.isAvailable()) {
-            totalP += product.getPublicPrice().getValue();
-            product.setStock(product.getStock() - 1);
+        double totalP = 0;
+        ArrayList<Product> productsSale = new ArrayList<>();
 
-            if (product.getStock() == 0) {
-                product.setAvailable(false);
+        while (true) {
+            System.out.println("Introduce el nombre del producto, escribir 0 para terminar:");
+            String name = sc.nextLine();
+
+            if (name.equals("0")) {
+                break;
             }
 
-            System.out.println("Producto añadido con éxito");
+            Product product = findProduct(name);
+
+            if (product != null && product.isAvailable()) {
+
+                totalP += product.getPublicPrice().getValue();
+                product.setStock(product.getStock() - 1);
+
+                if (product.getStock() == 0) {
+                    product.setAvailable(false);
+                }
+
+                productsSale.add(product); // ? GUARDAR PRODUCTO
+                System.out.println("Producto añadido con éxito: " + product);
+
+            } else {
+                System.out.println("Producto no encontrado o sin stock");
+            }
+        }
+
+        Amount totalAmount = new Amount(totalP);
+        cash.setValue(cash.getValue() + totalAmount.getValue());
+
+        // ?? IMPORTANTE: tu clase Sale debe aceptar esto
+        Sale sale = new Sale(client, productsSale, totalAmount);
+
+        sales.add(sale);
+
+        System.out.println("Venta realizada con éxito, total: " + totalAmount.getValue());
+
+        if (client.pay(totalAmount)) {
+            System.out.println("Su saldo es de: " + client.getBalance().getValue());
         } else {
-            System.out.println("Producto no encontrado o sin stock");
+            System.out.println("Tienes un saldo negativo de: " + client.getBalance().getValue());
         }
     }
-
-    Amount totalAmount = new Amount(totalP);
-
-    cash.setValue(cash.getValue() + totalAmount.getValue());
-
-    Sale sale = new Sale(client, totalAmount);
-    sales.add(sale);
-    cSales++;
-
-    System.out.println("Venta realizada con éxito, total: " + totalAmount.getValue());
-
-    if (client.pay(totalAmount)) {
-        System.out.println("Su saldo es de: " + client.getBalance().getValue());
-    } else {
-        System.out.println("Tienes un saldo negativo de: " + client.getBalance().getValue());
-    }
-}
-
 
     /**
      * show all sales
      */
     private void showSales() {
-    System.out.println("Lista de ventas:");
+        System.out.println("Lista de ventas:");
 
-    if (sales.isEmpty()) {
-        System.out.println("No hay ventas");
-        return;
-    }
+        if (sales.isEmpty()) {
+            System.out.println("No hay ventas");
+            return;
+        }
 
-    for (Sale sale : sales) {
-        System.out.println(sale);
+        for (Sale sale : sales) {
+            System.out.println(sale);
+        }
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Quieres exportar las ventas?");
+        String resp = sc.nextLine();
+        if (resp.equalsIgnoreCase("si")) {
+            Ficheros.writeSales(sales);
+        }
     }
-}
 
     /**
      * add a product to inventory
@@ -343,7 +343,6 @@ public class Shop {
 //            return false;
 //        }
 //    } 
-
     /**
      * find product by name
      *
@@ -351,31 +350,48 @@ public class Shop {
      * @return product found by name
      */
     public Product findProduct(String name) {
-        if(inventory.contains(new Product(name))){
-                return inventory.get(inventory.indexOf(new Product(name))) ;
-        }else 
+        if (inventory.contains(new Product(name))) {
+            return inventory.get(inventory.indexOf(new Product(name)));
+        } else {
             return null;
-       
-
-    }
-
-    public void deleteProduct() {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Ingresa el producto que quieres eliminar");
-        String pr = sc.nextLine();
-        Product product = findProduct(pr);
-        
-            if(product!=null){
-                inventory.remove(product);
-                System.out.println("Producto eliminado!");
-                
-            } else{
-                System.out.println("Producto no encontrado");
-        
-    }
         }
-        
+
     }
 
+    public void deleteProduct(Product product) {
+//        Scanner sc = new Scanner(System.in);
+        System.out.println("Ingresa el producto que quieres eliminar");
+//        String pr = sc.nextLine();
+//        Product product = findProduct(pr);
 
+        if (product != null) {
+            inventory.remove(product);
+            System.out.println("Producto eliminado!");
 
+        } else {
+            System.out.println("Producto no encontrado");
+
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Shop{" + "cash=" + cash + ", inventory=" + inventory + ", numberProducts=" + numberProducts + ", sales=" + sales + ", employee=" + employee + '}';
+    }
+
+    public Amount getCash() {
+        return cash;
+    }
+
+    public void setCash(Amount cash) {
+        this.cash = cash;
+    }
+
+    private void addStock() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+    
+    
+    
+
+}

@@ -9,12 +9,11 @@ public class Sale {
 	ArrayList <Product> products;
 	Amount amount;
 
-	public Sale( Client client, Amount amount) {
-		super();
-		this.client = client;
-		this.products = new ArrayList <> ();
-		this.amount = amount;
-	}
+	public Sale(Client client, ArrayList<Product> products, Amount amount) {
+    this.client = client;
+    this.products = new ArrayList<>(products);
+    this.amount = amount;
+}
 
     public Client getClient() {
         return client;
@@ -47,7 +46,7 @@ public class Sale {
 
     @Override
     public String toString() {
-        return "Sale{" + "client=" + client + ", products=" + products + ", amount=" + amount + '}';
+        return client.getName() + " " + products + " " + amount.getValue();
     }
 
     

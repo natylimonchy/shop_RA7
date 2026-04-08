@@ -27,6 +27,13 @@ public class Employee extends Person implements Logable{
         
     }
 
+    public Employee(int employeeld, String password, String name) {
+        super(name);
+        this.employeeld = employeeld;
+        this.password = password;
+    }
+    
+
     
     
 

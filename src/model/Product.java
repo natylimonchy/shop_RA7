@@ -15,10 +15,6 @@ public class Product {
    
     static double EXPIRATION_RATE = 0.60;
 
-    @Override
-    public String toString() {
-        return "Product{" + "id=" + id + ", name=" + name + ", publicPrice=" + publicPrice + ", wholesalerPrice=" + wholesalerPrice + ", available=" + available + ", stock=" + stock + '}';
-    }
 
     public Product(String name, Amount wholesalerPrice, boolean available, int stock) {
         super();
@@ -121,4 +117,10 @@ public class Product {
     return name.equalsIgnoreCase(p.name);
        
     }
+    @Override
+public String toString() {
+    return name + "," + publicPrice.getValue() + "?";
+}
+    
+    
 }
